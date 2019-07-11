@@ -13,12 +13,12 @@ public class MyTrainData implements TrainData {
 
     @Override
     public INDArray getX() {
-        return null;
+        return x;
     }
 
     @Override
     public INDArray getY() {
-        return null;
+        return y;
     }
 
     public void setX(INDArray x) {

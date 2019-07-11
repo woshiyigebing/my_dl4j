@@ -9,20 +9,16 @@ import java.util.List;
 
 public class LinearRegressionDL4J implements model{
 
-    //用于打印坐标系点
-    private INDArray x;
-    private INDArray y;
-
     //初始化斜率
-    public double w = 0;
+    private double w = 0;
 
     //初始化截距
-    public double b = 0;
+    private double b = 0;
 
     //初始化学习速度（梯度下降速度）
-    public double learningrate = 0.01d;
+    private double learningrate = 0.01d;
 
-    public static int iteration = 1000;
+    private int iteration = 1000;
 
 
     //初始化加载图像数据
@@ -106,15 +102,4 @@ public class LinearRegressionDL4J implements model{
         this.b = b;
     }
 
-    public static List<Double> doublesData(List<Double> list)
-    {
-        DecimalFormat df = new DecimalFormat("#.0000000000");
-        List<Double> xLists = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++)
-        {
-            String str = df.format(list.get(i));
-            xLists.add(Double.valueOf(str));
-        }
-        return xLists;
-    }
 }
