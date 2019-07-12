@@ -26,7 +26,7 @@ public class LinearRegressionDL4J implements model{
     }
 
 
-    public void fitBGD(INDArray x, INDArray y)
+    private void fitBGD(INDArray x, INDArray y)
     {
         double wt = this.getW();
         double bt = this.getB();
@@ -62,12 +62,11 @@ public class LinearRegressionDL4J implements model{
     public INDArray predict(INDArray x)
     {
         //wx+b
-        INDArray yc = x.mul(this.getW()).add(this.getB());
-        return yc;
+        return x.mul(this.getW()).add(this.getB());
     }
 
     //误差值
-    public double calc_error(INDArray x, INDArray y)
+    private double calc_error(INDArray x, INDArray y)
     {
         //y-wx-b
         INDArray yc = predict(x);
@@ -102,4 +101,7 @@ public class LinearRegressionDL4J implements model{
         this.b = b;
     }
 
+    public int getIteration() {
+        return iteration;
+    }
 }
