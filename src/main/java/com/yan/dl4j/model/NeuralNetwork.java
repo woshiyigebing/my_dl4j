@@ -5,8 +5,11 @@ import com.yan.dl4j.data.TrainData;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.omg.PortableInterceptor.INACTIVE;
+import oshi.util.MapUtil;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NeuralNetwork implements model  {
 
@@ -30,28 +33,59 @@ public class NeuralNetwork implements model  {
         System.out.println(my_Network_2LAYER_W);
     }
 
+    private Map<String,INDArray> forward(INDArray X){
+        Map<String,INDArray> map = new HashMap<>();
+        INDArray Z1 = getNetwork_1LAYER_W().mmul(X).add(getNetwork_1LAYER_B());
+        INDArray A1 = MyMathUtil.Mytanh(Z1);
+        INDArray Z2 = getNetwork_2LAYER_W().mmul(A1).add(getNetwork_2LAYER_B());
+        INDArray A2 = MyMathUtil.MysigMoid(Z2);
+        map.put("Z1",Z1);
+        map.put("A1",A1);
+        map.put("Z2",Z2);
+        map.put("A2",A2);
+        return map;
+    }
+
 
     @Override
     public void train(TrainData data) {
 
-        //向前传播
-        INDArray X = data.getX();
-        INDArray Y = data.getY();
-        INDArray Z1 = getNetwork_1LAYER_W().mmul(X).add(getNetwork_1LAYER_B());
-        INDArray A1 = MyMathUtil.Mytanh(Z1);
-        INDArray Z2 = getNetwork_2LAYER_W().mmul(A1).add(getNetwork_2LAYER_B());
-        INDArray A2 = MyMathUtil.Mytanh(Z2);
-        //向后传播
-
-        //Loss函数
-
-        //梯度下降
-
+        for(int i=0;i<getIteration();i++){
+            INDArray X = data.getX();
+            INDArray Y = data.getY();
+            //向前传播
+            Map<String,INDArray> map = forward(X);
+            INDArray Z1 = map.get("Z1");
+            INDArray A1 = map.get("A1");
+            INDArray Z2 = map.get("Z2");
+            INDArray A2 = map.get("A2");
+            //向后传播
+            INDArray dW1 = null;
+            INDArray dW2 = null;
+            INDArray dB1 = null;
+            INDArray dB2 = null;
+            //Loss函数
+            double loss =  Y.sub(A2).mmul(Y.sub(A2).transpose()).sumNumber().doubleValue();
+            //梯度下降
+            //W1 = W1 - dW1*r;
+                INDArray W1 = getNetwork_1LAYER_W().sub(dW1.mul(getLearningrate()));
+                INDArray W2 = getNetwork_2LAYER_W().sub(dW2.mul(getLearningrate()));
+                INDArray B1 = getNetwork_1LAYER_B().sub(dB1.mul(getLearningrate()));
+                INDArray B2 = getNetwork_2LAYER_B().sub(dB2.mul(getLearningrate()));
+                setNetwork_1LAYER_W(W1);
+                setNetwork_2LAYER_W(W2);
+                setNetwork_1LAYER_B(B1);
+                setNetwork_2LAYER_B(B2);
+            //打印情况
+            System.out.println("i="+i);
+            System.out.println("loss="+loss);
+        }
     }
 
     @Override
     public INDArray predict(INDArray x) {
-        return null;
+        Map<String,INDArray> map = forward(x);
+        return map.get("A2");
     }
 
     @Override
@@ -64,19 +98,35 @@ public class NeuralNetwork implements model  {
         return iteration;
     }
 
-    public INDArray getNetwork_1LAYER_W() {
+    private INDArray getNetwork_1LAYER_W() {
         return Network_1LAYER_W;
     }
 
-    public INDArray getNetwork_1LAYER_B() {
+    private INDArray getNetwork_1LAYER_B() {
         return Network_1LAYER_B;
     }
 
-    public INDArray getNetwork_2LAYER_W() {
+    private INDArray getNetwork_2LAYER_W() {
         return Network_2LAYER_W;
     }
 
-    public INDArray getNetwork_2LAYER_B() {
+    private INDArray getNetwork_2LAYER_B() {
         return Network_2LAYER_B;
+    }
+
+    private void setNetwork_1LAYER_W(INDArray network_1LAYER_W) {
+        Network_1LAYER_W = network_1LAYER_W;
+    }
+
+    private void setNetwork_1LAYER_B(INDArray network_1LAYER_B) {
+        Network_1LAYER_B = network_1LAYER_B;
+    }
+
+    private void setNetwork_2LAYER_W(INDArray network_2LAYER_W) {
+        Network_2LAYER_W = network_2LAYER_W;
+    }
+
+    private void setNetwork_2LAYER_B(INDArray network_2LAYER_B) {
+        Network_2LAYER_B = network_2LAYER_B;
     }
 }
