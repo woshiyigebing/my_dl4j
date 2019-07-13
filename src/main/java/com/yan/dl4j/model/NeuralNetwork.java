@@ -18,11 +18,11 @@ public class NeuralNetwork implements model  {
     private int iteration = 1000;
 
     //4个神经元 3个特征值 20个数据
-    //w = 4*3  x = 3*20 y = 4*20   =》z1 = 4*20;
+    //W1 = 4*3  X = 3*20 Z1 = 4*20   =》A1 = 4*20;
     private INDArray Network_1LAYER_W = Nd4j.ones(4, 3);
     private INDArray Network_1LAYER_B = Nd4j.ones(4, 1);
     //1个神经元 4个特征值 1个数据
-    //w = 1*4 x = 4*20 y = 1*20 => z2 = 1*20;
+    //W2 = 1*4 A1 = 4*20 Z2 = 1*20 => A2 = 1*20;
     private INDArray Network_2LAYER_W = Nd4j.create(new float[]{2, 2, 2, 2}, new int[]{1, 4});
     private INDArray Network_2LAYER_B = Nd4j.create(new float[]{2}, new int[]{1, 1});
 
@@ -60,11 +60,22 @@ public class NeuralNetwork implements model  {
             INDArray Z2 = map.get("Z2");
             INDArray A2 = map.get("A2");
             //向后传播
-            INDArray dW1 = null;
-            INDArray dW2 = null;
-            INDArray dB1 = null;
-            INDArray dB2 = null;
-            //Loss函数
+            //dL/dA2 = -(Y-A2)
+            //dA2/dZ2 = A2(1-A2)
+            //dZ2/dW2 = A1
+            //dZ/dB2 = 1
+            //dZ2/dA1 = W2
+            //dA1/dZ1 = 1 − A1^2
+            //dZ1/dW1 = X
+            //dZ1/dB1 = 1
+            INDArray dZ2 = Y.sub(A2).mul(A2).mul(A2.sub(1)); //1,20
+            INDArray a1p = Nd4j.ones(A1.shape()).sub(A1.mul(A1));
+            INDArray dZ1 = null; getNetwork_2LAYER_W().transpose().mmul(dZ2).mul(a1p);   //(W2^T dZ2)*(1-A1^2);
+            INDArray dW2 = dZ2.mmul(A1.transpose()); //1*4
+            INDArray dB2 = dZ2.mmul(Nd4j.ones(20,1));  //1,20  20，1
+            INDArray dW1 = dZ1.mmul(X.transpose());  //4*20//20*3=》 4*3
+            INDArray dB1 = dZ1.mmul(Nd4j.ones(20,1)); //4*1
+            //Loss函数 l = (1/2)*(y-yi)^2
             double loss =  Y.sub(A2).mmul(Y.sub(A2).transpose()).sumNumber().doubleValue();
             //梯度下降
             //W1 = W1 - dW1*r;
