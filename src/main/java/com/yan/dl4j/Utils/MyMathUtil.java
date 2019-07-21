@@ -9,18 +9,25 @@ public class MyMathUtil {
     public static double MysigMoid(double value) {
         //Math.E=e;Math.Pow(a,b)=a^b
         double ey = Math.pow(Math.E, -value);
-        double result = 1 / (1 + ey);
-        return result;
+        return 1 / (1 + ey);
     }
 
     public static INDArray MysigMoid(INDArray value) {
-        double[][] s = value.toDoubleMatrix();
-        for(int i=0;i<s.length;i++){
-            for(int j =0;j<s[i].length;j++){
-                s[i][j] = MysigMoid(s[i][j]);
+        if(value.shape()[0]>1){
+            double[][] s = value.toDoubleMatrix();
+            for(int i=0;i<s.length;i++){
+                for(int j =0;j<s[i].length;j++){
+                    s[i][j] = MysigMoid(s[i][j]);
+                }
             }
+            return Nd4j.create(s);
+        }else{
+            double[] s = value.toDoubleVector();
+            for(int i=0;i<s.length;i++){
+                    s[i] = MysigMoid(s[i]);
+            }
+            return Nd4j.create(s);
         }
-        return Nd4j.create(s);
     }
 
     public static double Mytanh(double value) {
@@ -28,8 +35,7 @@ public class MyMathUtil {
         double ey = Math.pow(Math.E, -value);//e^(-x)
         double sinhx = ex-ey;
         double coshx = ex+ey;
-        double result = sinhx/coshx;
-        return result;
+        return sinhx/coshx;
     }
     public static INDArray Mytanh(INDArray value) {
         double[][] s = value.toDoubleMatrix();
