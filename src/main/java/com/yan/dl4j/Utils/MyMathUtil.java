@@ -77,4 +77,30 @@ public class MyMathUtil {
         }
     }
 
+    public static double relu_back(double value) {
+        if(value>0){
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+
+    public static INDArray relu_back(INDArray value) {
+        if(value.shape()[0]>1){
+            double[][] s = value.toDoubleMatrix();
+            for(int i=0;i<s.length;i++){
+                for(int j =0;j<s[i].length;j++){
+                    s[i][j] = relu_back(s[i][j]);
+                }
+            }
+            return Nd4j.create(s);
+        }else{
+            double[] s = value.toDoubleVector();
+            for(int i=0;i<s.length;i++){
+                s[i] = relu_back(s[i]);
+            }
+            return Nd4j.create(s);
+        }
+    }
+
 }

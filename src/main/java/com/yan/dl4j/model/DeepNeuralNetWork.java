@@ -55,8 +55,28 @@ public class DeepNeuralNetWork implements model {
         return res;
     }
 
-    private List<INDArray[]> backward(INDArray[] A_array){
-        return null;
+    private List<INDArray[]> backward(INDArray[] A_array,INDArray x,INDArray Y){
+        INDArray DZ = MyMathUtil.relu_back(A_array[A_array.length-1].sub(Y));
+        INDArray[] DW = new INDArray[A_array.length];
+        INDArray[] DB = new INDArray[A_array.length];
+        List<INDArray[]> res = new ArrayList<>();
+        for(int i=A_array.length-1;i>=0;i--){
+            if(i==0){ //最后一次
+                INDArray dW = DZ.mmul(x.transpose());
+                INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
+                DW[i] = dW;
+                DB[i] = dB;
+            }else{
+                INDArray dW = DZ.mmul(A_array[i].transpose());
+                INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
+                DW[i] = dW;
+                DB[i] = dB;
+                DZ = Network_W[i].transpose().mmul(DZ).mul(Nd4j.ones(A_array[i-1].shape()).sub(A_array[i-1].mul(A_array[i-1])));
+            }
+        }
+        res.add(DW);
+        res.add(DB);
+        return res;
     }
 
     private void update_parameters(List<INDArray[]> DW_DB){
@@ -72,6 +92,21 @@ public class DeepNeuralNetWork implements model {
 
     @Override
     public void train(TrainData data) {
+
+        for(int i=0;i<getIteration();i++) {
+
+            INDArray[] A = forward(data.getX()); //向前传播
+
+            List<INDArray[]> DW_DB = backward(A, data.getX(), data.getY()); //反向传播
+
+            update_parameters(DW_DB); //梯度下降
+
+            double loss = data.getY().sub(A[A.length - 1]).mmul(data.getY().sub(A[A.length - 1]).transpose()).sumNumber().doubleValue();
+
+            //打印情况
+            System.out.println("i=" + i);
+            System.out.println("loss=" + loss);
+        }
 
     }
 
