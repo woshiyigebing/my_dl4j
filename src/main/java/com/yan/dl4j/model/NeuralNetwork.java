@@ -18,7 +18,7 @@ public class NeuralNetwork implements model  {
     private int iteration = 10000;
 
     //4个神经元 2个特征值 400个数据
-    //W1 = 4*3  X = 2*400 Z1 = 4*400   =》A1 = 4*400;
+    //W1 = 4*2  X = 2*400 Z1 = 4*400   =》A1 = 4*400;
     private INDArray Network_1LAYER_W = Nd4j.ones(4, 2);
     private INDArray Network_1LAYER_B = Nd4j.ones(4, 1);
     //1个神经元 4个特征值 1个数据
@@ -69,10 +69,10 @@ public class NeuralNetwork implements model  {
             //dZ1/dW1 = X
             //dZ1/dB1 = 1
             INDArray dZ2 = Y.sub(A2).mul(A2).mul(A2.sub(1)); //1*400
-            INDArray A1Z2 = Nd4j.ones(A1.shape()).sub(A1.mul(A1));
-            INDArray dZ1 = getNetwork_2LAYER_W().transpose().mmul(dZ2).mul(A1Z2);   //(W2^T dZ2)*(1-A1^2);
             INDArray dW2 = dZ2.mmul(A1.transpose()); //1*4
             INDArray dB2 = dZ2.mmul(Nd4j.ones(data.getX().shape()[1],1));  //1*1
+            INDArray dA1Z1 = Nd4j.ones(A1.shape()).sub(A1.mul(A1));
+            INDArray dZ1 = getNetwork_2LAYER_W().transpose().mmul(dZ2).mul(dA1Z1);   //(W2^T dZ2)*(1-A1^2);
             INDArray dW1 = dZ1.mmul(X.transpose());  //4*2
             INDArray dB1 = dZ1.mmul(Nd4j.ones(data.getX().shape()[1],1)); //4*1
             //Loss函数 l = (1/2)*(y-yi)^2

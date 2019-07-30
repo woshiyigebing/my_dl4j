@@ -38,13 +38,43 @@ public class MyMathUtil {
         return sinhx/coshx;
     }
     public static INDArray Mytanh(INDArray value) {
-        double[][] s = value.toDoubleMatrix();
-        for(int i=0;i<s.length;i++){
-            for(int j =0;j<s[i].length;j++){
-                s[i][j] = Mytanh(s[i][j]);
+        if(value.shape()[0]>1){
+            double[][] s = value.toDoubleMatrix();
+            for(int i=0;i<s.length;i++){
+                for(int j =0;j<s[i].length;j++){
+                    s[i][j] = Mytanh(s[i][j]);
+                }
             }
+            return Nd4j.create(s);
+        }else{
+            double[] s = value.toDoubleVector();
+            for(int i=0;i<s.length;i++){
+                s[i] = Mytanh(s[i]);
+            }
+            return Nd4j.create(s);
         }
-        return Nd4j.create(s);
+    }
+
+    public static double relu(double value) {
+        return Math.max(0,value);
+    }
+
+    public static INDArray relu(INDArray value) {
+        if(value.shape()[0]>1){
+            double[][] s = value.toDoubleMatrix();
+            for(int i=0;i<s.length;i++){
+                for(int j =0;j<s[i].length;j++){
+                    s[i][j] = relu(s[i][j]);
+                }
+            }
+            return Nd4j.create(s);
+        }else{
+            double[] s = value.toDoubleVector();
+            for(int i=0;i<s.length;i++){
+                s[i] = relu(s[i]);
+            }
+            return Nd4j.create(s);
+        }
     }
 
 }
