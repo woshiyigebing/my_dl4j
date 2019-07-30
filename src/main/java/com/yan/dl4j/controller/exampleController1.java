@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -42,17 +43,31 @@ public class exampleController1 {
     public List<point1> print() {
         List<point1> points = point1Repository.findAll();
         List<Double> X1 = new ArrayList<>();
-        List<Double> Y1 = new ArrayList<>();
+        List<Integer> Y1 = new ArrayList<>();
+        List<Double> X2 = new ArrayList<>();
+        List<Integer> Y2 = new ArrayList<>();
         model nk = new NeuralNetwork();
-        for(point1 the:points){
-            X1.add(the.getX());
-            X1.add(the.getY());
-            Y1.add(new Double(the.getZ()));
+        Collections.shuffle(points);
+        //训练集90%
+        for(int i=0;i<(int)Math.ceil(points.size()/10*9);i++){
+            X1.add(points.get(i).getX());
+            X1.add(points.get(i).getY());
+            Y1.add(points.get(i).getZ());
+        }
+        //测试集10%
+        for(int i=(int)Math.ceil(points.size()/10*9);i<points.size();i++){
+            X2.add(points.get(i).getX());
+            X2.add(points.get(i).getY());
+            Y2.add(points.get(i).getZ());
         }
         INDArray X = Nd4j.create(X1).reshape(new int[]{points.size(), 2});
         INDArray Y = Nd4j.create(Y1).reshape(new int[]{points.size(), 1});
-        TrainData data = new MyTrainData(X.transpose(),Y.transpose());
+        TrainData data = new MyTrainData(X,Y);
+        INDArray I_X2 = Nd4j.create(X2).reshape(new int[]{points.size(), 2});
+        INDArray I_Y2 = Nd4j.create(Y2).reshape(new int[]{points.size(), 1});
+        TrainData data2 = new MyTrainData(I_X2,I_Y2);
         nk.train(data);
+        nk.verify(data2);
         return points;
     }
 

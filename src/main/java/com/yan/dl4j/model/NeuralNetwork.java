@@ -109,6 +109,12 @@ public class NeuralNetwork implements model  {
         return iteration;
     }
 
+    @Override
+    public void verify(TrainData data) {
+        INDArray p_Y = predict(data.getX());
+        System.out.println(p_Y);
+    }
+
     private INDArray getNetwork_1LAYER_W() {
         return Network_1LAYER_W;
     }
@@ -140,4 +146,5 @@ public class NeuralNetwork implements model  {
     private void setNetwork_2LAYER_B(INDArray network_2LAYER_B) {
         Network_2LAYER_B = network_2LAYER_B;
     }
+
 }

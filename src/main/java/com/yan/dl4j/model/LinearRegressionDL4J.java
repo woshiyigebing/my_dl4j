@@ -16,7 +16,7 @@ public class LinearRegressionDL4J implements model{
     private double b = 0;
 
     //初始化学习速度（梯度下降速度）
-    private double learningrate = 0.1d;
+    private double learningrate = 0.01d;
 
     private int iteration = 1000;
 
@@ -81,27 +81,32 @@ public class LinearRegressionDL4J implements model{
     }
 
 
-    public double getW()
+    private double getW()
     {
         return w;
     }
 
-    public void setW(double w)
+    private void setW(double w)
     {
         this.w = w;
     }
 
-    public double getB()
+    private double getB()
     {
         return b;
     }
 
-    public void setB(double b)
+    private void setB(double b)
     {
         this.b = b;
     }
 
     public int getIteration() {
         return iteration;
+    }
+
+    @Override
+    public void verify(TrainData data) {
+
     }
 }

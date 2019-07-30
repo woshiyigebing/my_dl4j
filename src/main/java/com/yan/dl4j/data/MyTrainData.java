@@ -7,8 +7,8 @@ public class MyTrainData implements TrainData {
     private INDArray y;
 
     public MyTrainData(INDArray x,INDArray y){
-        this.x = x;
-        this.y = y;
+        this.x = x.transpose();
+        this.y = y.transpose();
     }
 
     @Override
@@ -21,6 +21,11 @@ public class MyTrainData implements TrainData {
         return y;
     }
 
+    @Override
+    public int getSize() {
+        return getX().columns();
+    }
+
     public void setX(INDArray x) {
         this.x = x;
     }
@@ -28,4 +33,5 @@ public class MyTrainData implements TrainData {
     public void setY(INDArray y) {
         this.y = y;
     }
+
 }
