@@ -79,7 +79,7 @@ public class MyMathUtil {
 
     public static double relu_back(double value) {
         if(value>0){
-            return 1;
+            return value;
         }else{
             return 0;
         }

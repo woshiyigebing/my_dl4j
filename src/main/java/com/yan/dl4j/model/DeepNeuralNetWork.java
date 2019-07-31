@@ -12,12 +12,12 @@ public class DeepNeuralNetWork implements model {
     private INDArray[] Network_W;
     private INDArray[] Network_B;
 
-    private double learningrate=0.01;
+    private double learningrate=0.1;
 
     private int iteration = 10000;
 
     //构建一个最后一层为relu激活函数，其他为sigmoid激活函数的深度神经网络
-    DeepNeuralNetWork(List<Integer> layers){
+    public DeepNeuralNetWork(List<Integer> layers){
         Network_W = new INDArray[layers.size()-1];
         Network_B = new INDArray[layers.size()-1];
         for(int i=1;i<layers.size();i++){
@@ -33,9 +33,12 @@ public class DeepNeuralNetWork implements model {
     private INDArray linear_activate_forward(INDArray A_p, INDArray W, INDArray b,String activate){
         if(activate.equals("relu")){
             return MyMathUtil.relu(linear_forward(A_p,W,b));
-        }else{
+        }else if(activate.equals("sigmoid")){
             return MyMathUtil.MysigMoid(linear_forward(A_p,W,b));
+        }else if(activate.equals("tanh")){
+            return MyMathUtil.Mytanh(linear_forward(A_p,W,b));
         }
+        return null;
 
     }
 
@@ -44,10 +47,10 @@ public class DeepNeuralNetWork implements model {
         INDArray P_A = X;
         for(int i=0;i<Network_W.length;i++){
            if(i+1>=Network_W.length){ //最后一个
-               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"relu");
+               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"sigmoid");
               res[i] = A;
            }else{
-               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"sigmoid");
+               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"tanh");
                P_A = A;
                res[i] = A;
            }
@@ -55,8 +58,19 @@ public class DeepNeuralNetWork implements model {
         return res;
     }
 
+    private INDArray activate_backward(INDArray DA, INDArray A, String activate){
+        if(activate.equals("relu")){
+            return MyMathUtil.relu_back(DA);
+        }else if(activate.equals("sigmoid")){
+            return DA.mul(A).mul(Nd4j.ones(A.shape()).sub(A));
+        }else if(activate.equals("tanh")){
+            return DA.mul(Nd4j.ones(A.shape()).sub(A.mul(A)));
+        }
+        return null;
+    }
+
     private List<INDArray[]> backward(INDArray[] A_array,INDArray x,INDArray Y){
-        INDArray DZ = MyMathUtil.relu_back(A_array[A_array.length-1].sub(Y));
+        INDArray DZ = activate_backward(A_array[A_array.length-1].sub(Y),A_array[A_array.length-1],"sigmoid");
         INDArray[] DW = new INDArray[A_array.length];
         INDArray[] DB = new INDArray[A_array.length];
         List<INDArray[]> res = new ArrayList<>();
@@ -67,11 +81,11 @@ public class DeepNeuralNetWork implements model {
                 DW[i] = dW;
                 DB[i] = dB;
             }else{
-                INDArray dW = DZ.mmul(A_array[i].transpose());
+                INDArray dW = DZ.mmul(A_array[i-1].transpose());
                 INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
                 DW[i] = dW;
                 DB[i] = dB;
-                DZ = Network_W[i].transpose().mmul(DZ).mul(Nd4j.ones(A_array[i-1].shape()).sub(A_array[i-1].mul(A_array[i-1])));
+                DZ = activate_backward(Network_W[i].transpose().mmul(DZ),A_array[i-1],"tanh");
             }
         }
         res.add(DW);
@@ -124,10 +138,5 @@ public class DeepNeuralNetWork implements model {
     @Override
     public int getIteration() {
         return iteration;
-    }
-
-    @Override
-    public void verify(TrainData data) {
-
     }
 }

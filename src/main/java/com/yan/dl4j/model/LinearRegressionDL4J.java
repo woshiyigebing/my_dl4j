@@ -105,8 +105,4 @@ public class LinearRegressionDL4J implements model{
         return iteration;
     }
 
-    @Override
-    public void verify(TrainData data) {
-
-    }
 }

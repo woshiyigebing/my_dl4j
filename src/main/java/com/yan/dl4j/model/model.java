@@ -8,5 +8,4 @@ public interface model {
      INDArray predict(INDArray x);
      double getLearningrate();
      int getIteration();
-     void verify(TrainData data);
 }

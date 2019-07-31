@@ -4,27 +4,23 @@ import com.yan.dl4j.Utils.MyMathUtil;
 import com.yan.dl4j.data.TrainData;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.omg.PortableInterceptor.INACTIVE;
-import oshi.util.MapUtil;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class NeuralNetwork implements model  {
 
-    private double learningrate=0.01;
+    private double learningrate=0.1;
 
     private int iteration = 10000;
 
     //4个神经元 2个特征值 400个数据
     //W1 = 4*2  X = 2*400 Z1 = 4*400   =》A1 = 4*400;
-    private INDArray Network_1LAYER_W = Nd4j.ones(4, 2);
-    private INDArray Network_1LAYER_B = Nd4j.ones(4, 1);
+    private INDArray Network_1LAYER_W = Nd4j.randn(4, 2);
+    private INDArray Network_1LAYER_B = Nd4j.zeros(4, 1);
     //1个神经元 4个特征值 1个数据
     //W2 = 1*4 A1 = 4*400 Z2 = 1*400 => A2 = 1*400;
-    private INDArray Network_2LAYER_W = Nd4j.create(new float[]{2, 2, 2, 2}, new int[]{1, 4});
-    private INDArray Network_2LAYER_B = Nd4j.create(new float[]{2}, new int[]{1, 1});
+    private INDArray Network_2LAYER_W = Nd4j.randn(1, 4);
+    private INDArray Network_2LAYER_B = Nd4j.zeros(1, 1);
 
     public static void main(String[] args) {
         INDArray my_Network_2LAYER_W = Nd4j.rand(1, 20);
@@ -109,11 +105,6 @@ public class NeuralNetwork implements model  {
         return iteration;
     }
 
-    @Override
-    public void verify(TrainData data) {
-        INDArray p_Y = predict(data.getX());
-        System.out.println(p_Y);
-    }
 
     private INDArray getNetwork_1LAYER_W() {
         return Network_1LAYER_W;
