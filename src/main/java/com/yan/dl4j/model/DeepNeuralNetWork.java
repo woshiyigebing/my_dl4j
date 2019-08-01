@@ -12,18 +12,32 @@ public class DeepNeuralNetWork implements model {
     private INDArray[] Network_W;
     private INDArray[] Network_B;
 
+    private String LossType;
+
     private double learningrate=0.03;
 
-    private int iteration = 100000;
+    private int iteration = 10000;
 
-    //构建一个最后一层为relu激活函数，其他为sigmoid激活函数的深度神经网络
+    //构建一个最后一层为sigmoid激活函数，其他为tanh激活函数的深度神经网络
+    public DeepNeuralNetWork(List<Integer> layers,String LossType){
+        if(LossType.equals("")||LossType==null){
+            Init(layers,"LogLoss");
+        }else{
+            Init(layers,LossType);
+        }
+    }
     public DeepNeuralNetWork(List<Integer> layers){
+        Init(layers,"LogLoss");
+    }
+
+    private void Init(List<Integer> layers,String LossType){
         Network_W = new INDArray[layers.size()-1];
         Network_B = new INDArray[layers.size()-1];
         for(int i=1;i<layers.size();i++){
             Network_W[i-1] = Nd4j.rand(layers.get(i), layers.get(i-1));
             Network_B[i-1] = Nd4j.zeros(layers.get(i), 1);
         }
+        this.LossType = LossType;
     }
 
     private INDArray linear_forward(INDArray A, INDArray W, INDArray b){
@@ -69,8 +83,28 @@ public class DeepNeuralNetWork implements model {
         return null;
     }
 
-    private List<INDArray[]> backward(INDArray[] A_array,INDArray x,INDArray Y){
-        INDArray DZ = activate_backward(A_array[A_array.length-1].sub(Y),A_array[A_array.length-1],"sigmoid");
+    private INDArray LossBackward(INDArray A,INDArray Y,String LossType){
+        if(LossType.equals("LogLoss")){
+            return A.sub(Y);
+        }else if(LossType.equals("MSE")){
+            return A.sub(Y);
+        }
+        return null;
+    }
+
+    private double LossFunction(INDArray A,INDArray Y,String LossType){
+        //return Y.sub(A).mmul(Y.sub(A).transpose()).sumNumber().doubleValue();
+        if(LossType.equals("LogLoss")){
+            INDArray logb =  (Nd4j.ones(Y.shape()).sub(Y)).mul(MyMathUtil.Log(Nd4j.ones(A.shape()).sub(A))).add(MyMathUtil.Log(A).mul(Y));
+            return  (0-logb.sumNumber().doubleValue())/Y.shape()[1];
+        }else if(LossType.equals("MSE")){
+            return (Y.sub(A).mmul(Y.sub(A).transpose()).sumNumber().doubleValue())/Y.shape()[1];
+        }
+        return 0;
+    }
+
+    private List<INDArray[]> backward(INDArray[] A_array,INDArray x,INDArray Y,String LossType){
+        INDArray DZ = activate_backward(LossBackward(A_array[A_array.length-1],Y,LossType),A_array[A_array.length-1],"sigmoid");
         INDArray[] DW = new INDArray[A_array.length];
         INDArray[] DB = new INDArray[A_array.length];
         List<INDArray[]> res = new ArrayList<>();
@@ -111,11 +145,11 @@ public class DeepNeuralNetWork implements model {
 
             INDArray[] A = forward(data.getX()); //向前传播
 
-            List<INDArray[]> DW_DB = backward(A, data.getX(), data.getY()); //反向传播
+            List<INDArray[]> DW_DB = backward(A, data.getX(), data.getY(),getLossType()); //反向传播
 
             update_parameters(DW_DB); //梯度下降
 
-            double loss = data.getY().sub(A[A.length - 1]).mmul(data.getY().sub(A[A.length - 1]).transpose()).sumNumber().doubleValue();
+            double loss = LossFunction(A[A.length - 1],data.getY(),"LogLoss");
 
             //打印情况
             System.out.println("i=" + i);
@@ -138,5 +172,13 @@ public class DeepNeuralNetWork implements model {
     @Override
     public int getIteration() {
         return iteration;
+    }
+
+    public String getLossType() {
+        return LossType;
+    }
+
+    public void setLossType(String lossType) {
+        LossType = lossType;
     }
 }

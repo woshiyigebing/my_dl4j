@@ -103,4 +103,26 @@ public class MyMathUtil {
         }
     }
 
+    public static double Log(double value) {
+        return Math.log(value);
+    }
+
+    public static INDArray Log(INDArray value) {
+        if(value.shape()[0]>1){
+            double[][] s = value.toDoubleMatrix();
+            for(int i=0;i<s.length;i++){
+                for(int j =0;j<s[i].length;j++){
+                    s[i][j] = Log(s[i][j]);
+                }
+            }
+            return Nd4j.create(s);
+        }else{
+            double[] s = value.toDoubleVector();
+            for(int i=0;i<s.length;i++){
+                s[i] = Log(s[i]);
+            }
+            return Nd4j.create(s);
+        }
+    }
+
 }
