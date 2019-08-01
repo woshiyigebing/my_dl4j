@@ -50,6 +50,7 @@ public class exampleController1 {
         //model nk = new NeuralNetwork();
         List<Integer> LARYER = new ArrayList<>();
         LARYER.add(2);
+        LARYER.add(10);
         LARYER.add(4);
         LARYER.add(1);
         model nk = new DeepNeuralNetWork(LARYER);

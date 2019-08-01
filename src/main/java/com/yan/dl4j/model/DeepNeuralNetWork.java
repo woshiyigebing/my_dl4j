@@ -12,9 +12,9 @@ public class DeepNeuralNetWork implements model {
     private INDArray[] Network_W;
     private INDArray[] Network_B;
 
-    private double learningrate=0.1;
+    private double learningrate=0.03;
 
-    private int iteration = 10000;
+    private int iteration = 100000;
 
     //构建一个最后一层为relu激活函数，其他为sigmoid激活函数的深度神经网络
     public DeepNeuralNetWork(List<Integer> layers){
