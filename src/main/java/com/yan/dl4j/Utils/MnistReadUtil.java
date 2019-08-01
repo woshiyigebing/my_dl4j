@@ -4,10 +4,7 @@ import org.nd4j.linalg.io.ClassPathResource;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class MnistReadUtil {
     public static final String TRAIN_IMAGES_FILE = "src\\main\\resources\\data\\train-images.idx3-ubyte";
@@ -40,8 +37,17 @@ public class MnistReadUtil {
      * @return one row show a `picture`
      */
     public static double[][] getImages(String fileName) {
-        double[][] x = null;
-        try (BufferedInputStream bin = new BufferedInputStream(new FileInputStream(fileName))) {
+        try{
+            return getImages(new FileInputStream(fileName));
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static double[][] getImages(InputStream inputStream) {
+        double[][] x;
+        try (BufferedInputStream bin = new BufferedInputStream(inputStream)) {
             byte[] bytes = new byte[4];
             bin.read(bytes, 0, 4);
             if (!"00000803".equals(bytesToHex(bytes))) {                        // 读取魔数
@@ -77,8 +83,17 @@ public class MnistReadUtil {
      * @return lables
      */
     public static double[] getLabels(String fileName) {
+        try{
+            return  getLabels(new FileInputStream(fileName));
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static double[] getLabels(InputStream inputStream) {
         double[] y;
-        try (BufferedInputStream bin = new BufferedInputStream(new FileInputStream(fileName))) {
+        try (BufferedInputStream bin = new BufferedInputStream(inputStream)) {
             byte[] bytes = new byte[4];
             bin.read(bytes, 0, 4);
             if (!"00000801".equals(bytesToHex(bytes))) {
