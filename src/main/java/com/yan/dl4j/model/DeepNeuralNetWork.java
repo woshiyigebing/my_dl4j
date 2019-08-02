@@ -65,7 +65,7 @@ public class DeepNeuralNetWork implements model {
                INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"sigmoid");
               res[i] = A;
            }else{
-               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"sigmoid");
+               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"tanh");
                P_A = A;
                res[i] = A;
            }
@@ -123,7 +123,7 @@ public class DeepNeuralNetWork implements model {
                 INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
                 DW[i] = dW;
                 DB[i] = dB;
-                DZ = activate_backward(Network_W[i].transpose().mmul(DZ),A_array[i-1],"sigmoid");
+                DZ = activate_backward(Network_W[i].transpose().mmul(DZ),A_array[i-1],"tanh");
             }
         }
         res.add(DW);

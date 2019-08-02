@@ -31,8 +31,9 @@ public class MnistController {
         double[] labels = MnistReadUtil.getLabels(TRAIN_LABELS_FILE.getInputStream());
         INDArray X = Nd4j.create(images);  //60000,784
         INDArray Y = Nd4j.create(labels).transpose(); //60000,1
-        INDArray Z = MyMathUtil.ONEHOT(Y);
-        TrainData data = new MyTrainData(X,Z,1000);
+        INDArray X_I = MyMathUtil.Normalization(X);
+        INDArray Y_I = MyMathUtil.ONEHOT(Y);
+        TrainData data = new MyTrainData(X_I,Y_I,1000);
         List<Integer> LARYER = new ArrayList<>();
         LARYER.add(28*28);
         LARYER.add(1000);

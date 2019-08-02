@@ -17,6 +17,14 @@ public class MyMathUtil {
         return FUN_IND(value,v->Epow(v));
     }
 
+    public static double Normalization(double value){
+        return value/255;
+    }
+
+    public static INDArray Normalization(INDArray value){
+        return FUN_IND(value,v->Normalization(v));
+    }
+
     public static INDArray ONEHOT(INDArray value){
         if(value.isColumnVector()){
             int[] s = value.toIntVector();
