@@ -1,6 +1,7 @@
 package com.yan.dl4j.model;
 
 import com.yan.dl4j.Utils.MyMathUtil;
+import com.yan.dl4j.data.INData;
 import com.yan.dl4j.data.TrainData;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -14,7 +15,7 @@ public class DeepNeuralNetWork implements model {
 
     private String LossType;
 
-    private double learningrate=0.03;
+    private double learningrate=0.01;
 
     private int iteration = 10000;
 
@@ -64,7 +65,7 @@ public class DeepNeuralNetWork implements model {
                INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"sigmoid");
               res[i] = A;
            }else{
-               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"tanh");
+               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"sigmoid");
                P_A = A;
                res[i] = A;
            }
@@ -99,6 +100,9 @@ public class DeepNeuralNetWork implements model {
             return  (0-logb.sumNumber().doubleValue())/Y.shape()[1];
         }else if(LossType.equals("MSE")){
             return (Y.sub(A).mmul(Y.sub(A).transpose()).sumNumber().doubleValue())/Y.shape()[1];
+        }else if(LossType.equals("CrossEntropy")){
+            INDArray los =  Y.mul(MyMathUtil.Log(A));
+            return  (0-los.sumNumber().doubleValue());
         }
         return 0;
     }
@@ -119,7 +123,7 @@ public class DeepNeuralNetWork implements model {
                 INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
                 DW[i] = dW;
                 DB[i] = dB;
-                DZ = activate_backward(Network_W[i].transpose().mmul(DZ),A_array[i-1],"tanh");
+                DZ = activate_backward(Network_W[i].transpose().mmul(DZ),A_array[i-1],"sigmoid");
             }
         }
         res.add(DW);
@@ -140,20 +144,21 @@ public class DeepNeuralNetWork implements model {
 
     @Override
     public void train(TrainData data) {
-
         for(int i=0;i<getIteration();i++) {
+            List<INData> batch_list = data.getBatchList();
+            for(int j=0;j<batch_list.size();j++){
+                INDArray[] A = forward(batch_list.get(j).getX()); //向前传播
 
-            INDArray[] A = forward(data.getX()); //向前传播
+                List<INDArray[]> DW_DB = backward(A, batch_list.get(j).getX(), batch_list.get(j).getY(),getLossType()); //反向传播
 
-            List<INDArray[]> DW_DB = backward(A, data.getX(), data.getY(),getLossType()); //反向传播
+                update_parameters(DW_DB); //梯度下降
 
-            update_parameters(DW_DB); //梯度下降
+                double loss = LossFunction(A[A.length - 1],batch_list.get(j).getY(),getLossType());
 
-            double loss = LossFunction(A[A.length - 1],data.getY(),"LogLoss");
-
-            //打印情况
-            System.out.println("i=" + i);
-            System.out.println("loss=" + loss);
+                //打印情况
+                System.out.println("i=" + (i*batch_list.size()+j));
+                System.out.println("loss=" + loss);
+            }
         }
 
     }
