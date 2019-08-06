@@ -21,7 +21,7 @@ public class DeepNeuralNetWork implements model {
     private INDArray[] Network_B;
     private int nin;
 
-    private double learningrate=0.01;
+    private double learningrate=0.0006;
 
     private int iteration = 10;
     public DeepNeuralNetWork(int nin){

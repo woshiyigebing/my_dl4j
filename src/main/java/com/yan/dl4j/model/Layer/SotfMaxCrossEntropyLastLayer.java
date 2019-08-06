@@ -29,6 +29,6 @@ public class SotfMaxCrossEntropyLastLayer extends MyLayer implements LastLayer {
 
     @Override
     public INDArray LastBackward(INDArray A, INDArray Y) {
-        return A.sub(Y);
+        return A.sub(Y); //简化操作
     }
 }

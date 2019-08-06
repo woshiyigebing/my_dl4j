@@ -6,11 +6,11 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 public class SoftMax implements ActivateMethod {
     @Override
     public INDArray activate_forward(INDArray A) {
-        return MyMathUtil.sotfmax(A);
+        return MyMathUtil.sotfmax(MyMathUtil.Normalization(A));
     }
 
     @Override
     public INDArray activate_backward(INDArray DA, INDArray A) {
-        return null;
+        return MyMathUtil.sotfmax_back(DA,A);
     }
 }

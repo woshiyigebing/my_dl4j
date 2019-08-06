@@ -163,4 +163,28 @@ public class MyMathUtil {
         }
         return null;
     }
+
+    //公式：
+    public static INDArray sotfmax_back(INDArray DA,INDArray A){
+        if(A!=null){
+            double[][] da = DA.transpose().toDoubleMatrix();
+            double[][] a = A.transpose().toDoubleMatrix();
+            double[][] res = new double[da.length][da[0].length];
+                for(int i=0;i<da.length;i++){
+                    int i_order = 0;
+                    for(int j=0;j<da[i].length;j++){
+                        if(da[i][j]!=0){i_order = j;}
+                    }
+                    for(int j=0;j<da[i].length;j++){
+                        if(j==i_order){
+                            res[i][j] = a[i][j]*(1-a[i][j]);
+                        }else{
+                            res[i][j] = -a[i][j]*(a[i][i_order]);
+                        }
+                    }
+                }
+                return Nd4j.create(res).transpose();
+        }
+        return null;
+    }
 }
