@@ -36,7 +36,7 @@ public class MyTrainData implements TrainData {
     @Override
     public List<INData> getBatchList() {
         List<INData> res = new ArrayList<>();
-        //shufflecard();
+        shufflecard();
         if(batch_size!=-1){
             int lastColumnOrder = 0;
             for(int i=batch_size;i<getSize();i=i+batch_size){

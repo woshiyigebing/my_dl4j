@@ -23,7 +23,7 @@ public class DeepNeuralNetWork implements model {
 
     private double learningrate=0.01;
 
-    private int iteration = 10000;
+    private int iteration = 10;
     public DeepNeuralNetWork(int nin){
         this.nin = nin;
     }
@@ -100,13 +100,13 @@ public class DeepNeuralNetWork implements model {
             if(i==0){ //最后一次
                 INDArray dW = DZ.mmul(x.transpose());
                 INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
-                DW[i] = dW;
-                DB[i] = dB;
+                DW[i] = dW.div(x.shape()[1]);
+                DB[i] = dB.div(x.shape()[1]);
             }else{
                 INDArray dW = DZ.mmul(A_array[i-1].transpose());
                 INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
-                DW[i] = dW;
-                DB[i] = dB;
+                DW[i] = dW.div(x.shape()[1]);
+                DB[i] = dB.div(x.shape()[1]);
                 DZ = activate_backward(Network_W[i].transpose().mmul(DZ),A_array[i-1],layers.get(i-1).getActivateMethod());
             }
         }

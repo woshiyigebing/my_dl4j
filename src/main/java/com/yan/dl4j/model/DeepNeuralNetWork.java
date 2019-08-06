@@ -16,9 +16,9 @@ public class DeepNeuralNetWork implements model {
 
     private String LossType;
 
-    private double learningrate=0.01;
+    private double learningrate=0.1;
 
-    private int iteration = 10000;
+    private int iteration = 100000;
 
     //构建一个最后一层为sigmoid激活函数，其他为tanh激活函数的深度神经网络
     public DeepNeuralNetWork(List<Integer> layers,String LossType){
@@ -67,10 +67,10 @@ public class DeepNeuralNetWork implements model {
         INDArray P_A = X;
         for(int i=0;i<Network_W.length;i++){
            if(i+1>=Network_W.length){ //最后一个
-               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"softmax");
+               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"sigmoid");
               res[i] = A;
            }else{
-               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"relu");
+               INDArray A = linear_activate_forward(P_A,Network_W[i],Network_B[i],"tanh");
                P_A = A;
                res[i] = A;
            }
@@ -119,7 +119,7 @@ public class DeepNeuralNetWork implements model {
 
     private List<INDArray[]> backward(INDArray[] A_array,INDArray x,INDArray Y,String LossType){
         //INDArray DZ = LastBackward(A_array[A_array.length-1],Y);
-        INDArray DZ = activate_backward(LossBackward(A_array[A_array.length-1],Y,LossType),A_array[A_array.length-1],"relu");
+        INDArray DZ = activate_backward(LossBackward(A_array[A_array.length-1],Y,LossType),A_array[A_array.length-1],"sigmoid");
         INDArray[] DW = new INDArray[A_array.length];
         INDArray[] DB = new INDArray[A_array.length];
         List<INDArray[]> res = new ArrayList<>();
@@ -127,14 +127,14 @@ public class DeepNeuralNetWork implements model {
             if(i==0){ //最后一次
                 INDArray dW = DZ.mmul(x.transpose());
                 INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
-                DW[i] = dW;
-                DB[i] = dB;
+                DW[i] = dW.div(x.shape()[1]);
+                DB[i] = dB.div(x.shape()[1]);
             }else{
                 INDArray dW = DZ.mmul(A_array[i-1].transpose());
                 INDArray dB = DZ.mmul(Nd4j.ones(x.shape()[1],1));
-                DW[i] = dW;
-                DB[i] = dB;
-                DZ = activate_backward(Network_W[i].transpose().mmul(DZ),A_array[i-1],"relu");
+                DW[i] = dW.div(x.shape()[1]);
+                DB[i] = dB.div(x.shape()[1]);
+                DZ = activate_backward(Network_W[i].transpose().mmul(DZ),A_array[i-1],"tanh");
             }
         }
         res.add(DW);

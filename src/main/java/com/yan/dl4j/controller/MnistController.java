@@ -5,11 +5,17 @@ import com.yan.dl4j.Utils.MyMathUtil;
 import com.yan.dl4j.data.MyTrainData;
 import com.yan.dl4j.data.TrainData;
 import com.yan.dl4j.model.Activate.Relu;
+import com.yan.dl4j.model.Activate.Sigmoid;
+import com.yan.dl4j.model.Activate.SoftMax;
+import com.yan.dl4j.model.Layer.MyLastLayer;
 import com.yan.dl4j.model.Layer.MyLayer;
 import com.yan.dl4j.model.Layer.SotfMaxCrossEntropyLastLayer;
+import com.yan.dl4j.model.Loss.LogLoss;
+import com.yan.dl4j.model.Loss.MSE;
 import com.yan.dl4j.model.NetWork.DeepNeuralNetWork;
 import com.yan.dl4j.model.model;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.accum.SoftmaxCrossEntropyLoss;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +48,38 @@ public class MnistController {
 //        LARYER.add(10);
 //        model nk = new DeepNeuralNetWork(LARYER,"CrossEntropy");
         nk.train(data);
+        double[][] t_images = MnistReadUtil.getImages(TEST_IMAGES_FILE.getInputStream());
+        double[] t_labels = MnistReadUtil.getLabels(TEST_LABELS_FILE.getInputStream());
+        INDArray X_t = MyMathUtil.Normalization(Nd4j.create(t_images));
+        INDArray Y_t = MyMathUtil.ONEHOT(Nd4j.create(t_labels).transpose());
+        TrainData data_t = new MyTrainData(X_t,Y_t);
+        INDArray X_P = nk.predict(data_t.getX());
+        System.out.println(scord(X_P,data_t.getY()));
         return "success";
+    }
+
+    public float scord(INDArray value,INDArray Y) {
+        int res = 0;
+        int sum = 0;
+            double[][] s = value.transpose().toDoubleMatrix();
+            double[][] Ys = Y.transpose().toDoubleMatrix();
+            for(int i=0;i<s.length;i++){
+                double Max = -1;
+                int order = -1;
+                for(int j =0;j<s[i].length;j++){
+                    order = Max>s[i][j]?order:j;
+                    Max = Max>s[i][j]?Max:s[i][j];
+                }
+                if(order>0&&new Double(Ys[i][order]).intValue()==1){
+                    res++;
+                }
+                sum++;
+            }
+            if(sum>0){
+                return ((float)res/sum)*100;
+            }else{
+                return 0;
+            }
     }
 
 }
