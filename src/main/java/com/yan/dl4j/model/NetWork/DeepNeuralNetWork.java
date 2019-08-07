@@ -21,7 +21,7 @@ public class DeepNeuralNetWork implements model {
     private INDArray[] Network_B;
     private int nin;
 
-    private double learningrate=0.0006;
+    private double learningrate=0.00000006;
 
     private int iteration = 10;
     public DeepNeuralNetWork(int nin){
@@ -83,7 +83,7 @@ public class DeepNeuralNetWork implements model {
     }
 
     private INDArray LossBackward(INDArray A,INDArray Y){
-        return lastLayer.getLossMethod().LossBackward(A,Y);
+        return lastLayer.LastBackward(A,Y);
     }
 
     private double LossForward(INDArray A,INDArray Y){

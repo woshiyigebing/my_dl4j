@@ -18,36 +18,54 @@ public class MyMathUtil {
         return value/Max;
     }
 
-    public static INDArray Normalization(INDArray value){
-        double my_Max = 1;
+    public static double MaxValue(INDArray value){
         if(value.shape()[0]>1){
             double[][] s = value.toDoubleMatrix();
+            double my_Max=s[0][0];
             for(double[] si:s){
                 for(double sj:si){
-                    my_Max = my_Max>sj?my_Max:sj;
+                    my_Max = Math.max(my_Max,sj);
                 }
             }
+            return my_Max;
         }else{
             double[] s = value.toDoubleVector();
+            double my_Max=s[0];
             for(double si:s){
-                my_Max = my_Max>si?my_Max:si;
+                my_Max = Math.max(my_Max,si);
             }
+            return my_Max;
         }
-        if(value.shape()[0]>1){
-            double[][] s = value.toDoubleMatrix();
-            for(int i=0;i<s.length;i++){
-                for(int j =0;j<s[i].length;j++){
-                    s[i][j] = s[i][j]/my_Max;
+    }
+
+    public static INDArray Normalization(INDArray value){
+        double my_Max = MaxValue(value);
+        return FUN_IND(value,s->s/my_Max);
+    }
+
+    public static INDArray indArraysubMax(INDArray value){
+        if(value!=null){
+            if(value.shape()[0]>1){
+                double[][] s = value.transpose().toDoubleMatrix();
+                for(int i=0;i<s.length;i++){
+                    double Max = s[i][0];
+                    for(int j =0;j<s[i].length;j++){
+                        Max = Math.max(Max,s[i][j]);
+                    }
+                    for(int j =0;j<s[i].length;j++){
+                       s[i][j] = s[i][j]/Max;
+                    }
                 }
+                return Nd4j.create(s).transpose();
+            }else{
+                double[] s = value.toDoubleVector();
+                for(int i=0;i<s.length;i++){
+                    s[i] = 0;
+                }
+                return Nd4j.create(s);
             }
-            return Nd4j.create(s);
-        }else{
-            double[] s = value.toDoubleVector();
-            for(int i=0;i<s.length;i++){
-                s[i] = s[i]/my_Max;
-            }
-            return Nd4j.create(s);
         }
+        return null;
     }
 
     public static INDArray ONEHOT(INDArray value){
@@ -149,14 +167,14 @@ public class MyMathUtil {
             A = MyMathUtil.Epow(A);  //A: 10,128
             INDArray sum_A = Nd4j.ones(1,A.shape()[0]).mmul(A); //1,128
             if(A.shape()[0]>1){
-                double[][] A_s = A.toDoubleMatrix();
+                double[][] A_s = A.transpose().toDoubleMatrix(); //128 10
                 double[] SUM_A_s = sum_A.toDoubleVector();
                 for(int i=0;i<A_s.length;i++){
                     for(int j =0;j<A_s[i].length;j++){
-                        A_s[i][j] = A_s[i][j]/SUM_A_s[j];
+                        A_s[i][j] = A_s[i][j]/SUM_A_s[i];
                     }
                 }
-                return Nd4j.create(A_s);
+                return Nd4j.create(A_s).transpose();
             }else{
                 return Nd4j.ones(A.shape());
             }

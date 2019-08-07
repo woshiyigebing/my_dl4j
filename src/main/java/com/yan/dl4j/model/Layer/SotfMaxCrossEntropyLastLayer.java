@@ -1,7 +1,5 @@
 package com.yan.dl4j.model.Layer;
 
-import com.yan.dl4j.model.Activate.ActivateMethod;
-import com.yan.dl4j.model.Activate.Sigmoid;
 import com.yan.dl4j.model.Activate.SoftMax;
 import com.yan.dl4j.model.Loss.CrossEntropy;
 import com.yan.dl4j.model.Loss.LossMethod;
@@ -27,8 +25,8 @@ public class SotfMaxCrossEntropyLastLayer extends MyLayer implements LastLayer {
         return this;
     }
 
-    @Override
-    public INDArray LastBackward(INDArray A, INDArray Y) {
-        return A.sub(Y); //简化操作
-    }
+//    @Override
+//    public INDArray LastBackward(INDArray A, INDArray Y) {
+//        return A.sub(Y); //简化操作
+//    }
 }
