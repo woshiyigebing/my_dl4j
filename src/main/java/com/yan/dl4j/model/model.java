@@ -8,4 +8,6 @@ public interface model {
      INDArray predict(INDArray x);
      double getLearningrate();
      int getIteration();
+     model setLearningrate(double rate);
+     model setIteration(int iteration);
 }

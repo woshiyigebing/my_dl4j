@@ -21,7 +21,7 @@ public class DeepNeuralNetWork implements model {
     private INDArray[] Network_B;
     private int nin;
 
-    private double learningrate=0.00000006;
+    private double learningrate=0.01;
 
     private int iteration = 10;
     public DeepNeuralNetWork(int nin){
@@ -161,5 +161,17 @@ public class DeepNeuralNetWork implements model {
     @Override
     public int getIteration() {
         return iteration;
+    }
+
+    @Override
+    public model setLearningrate(double rate) {
+        this.learningrate = rate;
+        return this;
+    }
+
+    @Override
+    public model setIteration(int iteration) {
+        this.iteration = iteration;
+        return this;
     }
 }

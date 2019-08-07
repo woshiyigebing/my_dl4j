@@ -18,7 +18,7 @@ public class DeepNeuralNetWork implements model {
 
     private double learningrate=0.1;
 
-    private int iteration = 100000;
+    private int iteration = 10000;
 
     //构建一个最后一层为sigmoid激活函数，其他为tanh激活函数的深度神经网络
     public DeepNeuralNetWork(List<Integer> layers,String LossType){
@@ -188,6 +188,18 @@ public class DeepNeuralNetWork implements model {
     @Override
     public int getIteration() {
         return iteration;
+    }
+
+    @Override
+    public model setLearningrate(double rate) {
+        this.learningrate = rate;
+        return this;
+    }
+
+    @Override
+    public model setIteration(int iteration) {
+        this.iteration = iteration;
+        return this;
     }
 
     public String getLossType() {

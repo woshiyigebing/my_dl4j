@@ -11,7 +11,7 @@ public class NeuralNetwork implements model  {
 
     private double learningrate=0.1;
 
-    private int iteration = 10000;
+    private int iteration = 100000;
 
     //4个神经元 2个特征值 400个数据
     //W1 = 4*2  X = 2*400 Z1 = 4*400   =》A1 = 4*400;
@@ -72,13 +72,13 @@ public class NeuralNetwork implements model  {
             INDArray dW1 = dZ1.mmul(X.transpose());  //4*2
             INDArray dB1 = dZ1.mmul(Nd4j.ones(data.getX().shape()[1],1)); //4*1
             //Loss函数 l = (1/2)*(y-yi)^2
-            double loss =  Y.sub(A2).mmul(Y.sub(A2).transpose()).sumNumber().doubleValue();
+            double loss =  Y.sub(A2).mmul(Y.sub(A2).transpose()).sumNumber().doubleValue()/Y.shape()[1];
             //梯度下降
             //W1 = W1 - dW1*r;
-                INDArray W1 = getNetwork_1LAYER_W().sub(dW1.mul(getLearningrate()));
-                INDArray W2 = getNetwork_2LAYER_W().sub(dW2.mul(getLearningrate()));
-                INDArray B1 = getNetwork_1LAYER_B().sub(dB1.mul(getLearningrate()));
-                INDArray B2 = getNetwork_2LAYER_B().sub(dB2.mul(getLearningrate()));
+                INDArray W1 = getNetwork_1LAYER_W().sub(dW1.div(data.getX().shape()[1]).mul(getLearningrate()));
+                INDArray W2 = getNetwork_2LAYER_W().sub(dW2.div(data.getX().shape()[1]).mul(getLearningrate()));
+                INDArray B1 = getNetwork_1LAYER_B().sub(dB1.div(data.getX().shape()[1]).mul(getLearningrate()));
+                INDArray B2 = getNetwork_2LAYER_B().sub(dB2.div(data.getX().shape()[1]).mul(getLearningrate()));
                 setNetwork_1LAYER_W(W1);
                 setNetwork_2LAYER_W(W2);
                 setNetwork_1LAYER_B(B1);
@@ -138,4 +138,15 @@ public class NeuralNetwork implements model  {
         Network_2LAYER_B = network_2LAYER_B;
     }
 
+    @Override
+    public model setLearningrate(double rate) {
+        this.learningrate = rate;
+        return this;
+    }
+
+    @Override
+    public model setIteration(int iteration) {
+        this.iteration = iteration;
+        return this;
+    }
 }

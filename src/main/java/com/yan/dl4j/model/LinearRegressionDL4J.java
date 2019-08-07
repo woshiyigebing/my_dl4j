@@ -80,6 +80,11 @@ public class LinearRegressionDL4J implements model{
         return learningrate;
     }
 
+    @Override
+    public int getIteration() {
+        return iteration;
+    }
+
 
     private double getW()
     {
@@ -101,8 +106,16 @@ public class LinearRegressionDL4J implements model{
         this.b = b;
     }
 
-    public int getIteration() {
-        return iteration;
+    @Override
+    public model setLearningrate(double rate) {
+        this.learningrate = rate;
+        return this;
+    }
+
+    @Override
+    public model setIteration(int iteration) {
+        this.iteration = iteration;
+        return this;
     }
 
 }

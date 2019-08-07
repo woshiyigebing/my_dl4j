@@ -6,9 +6,13 @@ import com.yan.dl4j.data.MyTrainData;
 import com.yan.dl4j.data.TrainData;
 import com.yan.dl4j.entity.point;
 import com.yan.dl4j.entity.point1;
-import com.yan.dl4j.model.DeepNeuralNetWork;
+import com.yan.dl4j.model.Activate.Sigmoid;
+import com.yan.dl4j.model.Activate.Tanh;
+import com.yan.dl4j.model.Layer.MyLastLayer;
+import com.yan.dl4j.model.Layer.MyLayer;
 import com.yan.dl4j.model.LinearRegressionDL4J;
-import com.yan.dl4j.model.NeuralNetwork;
+import com.yan.dl4j.model.Loss.MSE;
+import com.yan.dl4j.model.NetWork.DeepNeuralNetWork;
 import com.yan.dl4j.model.model;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -48,12 +52,14 @@ public class exampleController1 {
         List<Double> X2 = new ArrayList<>();
         List<Integer> Y2 = new ArrayList<>();
         //model nk = new NeuralNetwork();
-        List<Integer> LARYER = new ArrayList<>();
-        LARYER.add(2);
-        LARYER.add(10);
-        LARYER.add(4);
-        LARYER.add(1);
-        model nk = new DeepNeuralNetWork(LARYER);
+//        List<Integer> LARYER = new ArrayList<>();
+//        LARYER.add(2);
+//        LARYER.add(4);
+//        LARYER.add(1);
+//        model nk = new DeepNeuralNetWork(LARYER,"MSE");
+        model nk = new DeepNeuralNetWork(2)
+                .addLayer(new MyLayer(4,new Tanh()))
+                .addLastLayer(new MyLastLayer(1,new Sigmoid(),new MSE())).setIteration(10000).setLearningrate(0.1);
         Collections.shuffle(points);
         int plot = (int)Math.ceil(points.size()/10*8);
         //训练集80%
