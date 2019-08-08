@@ -20,6 +20,7 @@ public class DeepNeuralNetWork implements model {
     private INDArray[] Network_W;
     private INDArray[] Network_B;
     private int nin;
+    private int seed=123;
 
     private double learningrate=0.01;
 
@@ -41,13 +42,13 @@ public class DeepNeuralNetWork implements model {
         Network_B = new INDArray[layers.size()+1];
         for(int i=0;i<layers.size()+1;i++){
             if(i==0){ //第一个
-                Network_W[i] = Nd4j.rand(layers.get(i).getNeuralNumber(), nin);
+                Network_W[i] = layers.get(i).getWinit().Init(seed,layers.get(i).getNeuralNumber(), nin);
                 Network_B[i] = Nd4j.zeros(layers.get(i).getNeuralNumber(), 1);
             }else if(i==layers.size()){ //最后一个
-                Network_W[i] = Nd4j.rand(lastLayer.getNeuralNumber(), layers.get(i-1).getNeuralNumber());
+                Network_W[i] = layers.get(i-1).getWinit().Init(seed,lastLayer.getNeuralNumber(), layers.get(i-1).getNeuralNumber());
                 Network_B[i] = Nd4j.zeros(lastLayer.getNeuralNumber(), 1);
             }else{
-                Network_W[i] = Nd4j.rand(layers.get(i).getNeuralNumber(), layers.get(i-1).getNeuralNumber());
+                Network_W[i] = layers.get(i-1).getWinit().Init(seed,layers.get(i).getNeuralNumber(), layers.get(i-1).getNeuralNumber());
                 Network_B[i] = Nd4j.zeros(layers.get(i).getNeuralNumber(), 1);
             }
         }

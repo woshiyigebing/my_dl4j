@@ -58,7 +58,7 @@ public class exampleController1 {
 //        LARYER.add(1);
 //        model nk = new DeepNeuralNetWork(LARYER,"MSE");
         model nk = new DeepNeuralNetWork(2)
-                .addLayer(new MyLayer(4,new Tanh()))
+                .addLayer(new MyLayer(10,new Tanh()))
                 .addLastLayer(new MyLastLayer(1,new Sigmoid(),new MSE())).setIteration(10000).setLearningrate(0.1);
         Collections.shuffle(points);
         int plot = (int)Math.ceil(points.size()/10*8);

@@ -41,7 +41,7 @@ public class MnistController {
         INDArray Y = Nd4j.create(labels).transpose(); //60000,1
         INDArray X_I = MyMathUtil.Normalization(X);
         INDArray Y_I = MyMathUtil.ONEHOT(Y);//60000,10
-        TrainData data = new MyTrainData(X_I,Y_I,8192);
+        TrainData data = new MyTrainData(X_I,Y_I,128);
         model nk = new DeepNeuralNetWork(28*28)
                 .addLayer(new MyLayer(1000,new Relu()))
                 .addLastLayer(new SotfMaxCrossEntropyLastLayer(10)).setIteration(100).setLearningrate(0.006);
