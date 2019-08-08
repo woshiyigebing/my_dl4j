@@ -2,6 +2,7 @@ package com.yan.dl4j.controller;
 
 import com.yan.dl4j.Utils.MnistReadUtil;
 import com.yan.dl4j.Utils.MyMathUtil;
+import com.yan.dl4j.data.INData;
 import com.yan.dl4j.data.MyTrainData;
 import com.yan.dl4j.data.TrainData;
 import com.yan.dl4j.model.Activate.Relu;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/mnist")
 public class MnistController {
@@ -38,10 +41,10 @@ public class MnistController {
         INDArray Y = Nd4j.create(labels).transpose(); //60000,1
         INDArray X_I = MyMathUtil.Normalization(X);
         INDArray Y_I = MyMathUtil.ONEHOT(Y);//60000,10
-        TrainData data = new MyTrainData(X_I,Y_I,128);
+        TrainData data = new MyTrainData(X_I,Y_I,8192);
         model nk = new DeepNeuralNetWork(28*28)
                 .addLayer(new MyLayer(1000,new Relu()))
-                .addLastLayer(new SotfMaxCrossEntropyLastLayer(10));
+                .addLastLayer(new SotfMaxCrossEntropyLastLayer(10)).setIteration(100).setLearningrate(0.006);
 //        List<Integer> LARYER = new ArrayList<>();
 //        LARYER.add(28*28);
 //        LARYER.add(1000);
@@ -55,6 +58,26 @@ public class MnistController {
         TrainData data_t = new MyTrainData(X_t,Y_t);
         INDArray X_P = nk.predict(data_t.getX());
         System.out.println(scord(X_P,data_t.getY()));
+        return "success";
+    }
+
+    @GetMapping(value = "test")
+    public String test() {
+        double[][] matrixDouble = new double[][]{
+                {1, 1, 1},
+                {2, 2, 2},
+                {3, 3, 3},
+                {4, 4, 4},
+                {5, 5, 5},
+                {6, 6, 6},
+                {7, 7, 7},
+                {8, 8, 8},
+                {9, 9, 9},
+        };
+        INDArray X = Nd4j.create (matrixDouble);  //9,3
+        INDArray Y = Nd4j.create (matrixDouble);  //9,3
+        TrainData data = new MyTrainData(X,Y,2);
+        List<INData> data1 =  data.getBatchList();
         return "success";
     }
 

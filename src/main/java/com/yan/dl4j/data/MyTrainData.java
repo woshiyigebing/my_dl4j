@@ -36,7 +36,7 @@ public class MyTrainData implements TrainData {
     @Override
     public List<INData> getBatchList() {
         List<INData> res = new ArrayList<>();
-        //shufflecard();
+        shufflecard();
         if(batch_size!=-1){
             int lastColumnOrder = 0;
             for(int i=batch_size;i<getSize();i=i+batch_size){
@@ -78,9 +78,9 @@ public class MyTrainData implements TrainData {
         INDArray temp_y ;
         for(int i=0;i<getSize();i++){
             int j = rd.nextInt(getSize());
-            temp_x = x.getColumn(i);
-            temp_y = y.getColumn(i);
-            x.putColumn(i,x.getColumn(j));
+            temp_x = x.getColumn(i).add(0);
+            temp_y = y.getColumn(i).add(0);
+            x.putColumn(i,x.getColumn(j).add(0));
             x.putColumn(j,temp_x);
             y.putColumn(i,y.getColumn(j));
             y.putColumn(j,temp_y);
