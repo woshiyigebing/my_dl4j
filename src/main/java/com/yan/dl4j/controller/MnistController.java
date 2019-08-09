@@ -8,6 +8,7 @@ import com.yan.dl4j.data.TrainData;
 import com.yan.dl4j.model.Activate.Relu;
 import com.yan.dl4j.model.Activate.Sigmoid;
 import com.yan.dl4j.model.Activate.SoftMax;
+import com.yan.dl4j.model.Activate.Tanh;
 import com.yan.dl4j.model.Layer.MyLastLayer;
 import com.yan.dl4j.model.Layer.MyLayer;
 import com.yan.dl4j.model.Layer.SotfMaxCrossEntropyLastLayer;
@@ -43,7 +44,7 @@ public class MnistController {
         INDArray Y_I = MyMathUtil.ONEHOT(Y);//60000,10
         TrainData data = new MyTrainData(X_I,Y_I,128);
         model nk = new DeepNeuralNetWork(28*28)
-                .addLayer(new MyLayer(1000,new Relu()))
+                .addLayer(new MyLayer(500,new Tanh()))
                 .addLastLayer(new SotfMaxCrossEntropyLastLayer(10)).setIteration(100).setLearningrate(0.06);
 //        List<Integer> LARYER = new ArrayList<>();
 //        LARYER.add(28*28);
