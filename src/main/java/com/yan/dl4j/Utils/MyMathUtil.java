@@ -3,6 +3,7 @@ package com.yan.dl4j.Utils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import java.math.BigDecimal;
 import java.util.function.DoubleFunction;
 
 public class MyMathUtil {
@@ -53,7 +54,7 @@ public class MyMathUtil {
                         Max = Math.max(Max,s[i][j]);
                     }
                     for(int j =0;j<s[i].length;j++){
-                       s[i][j] = s[i][j]/Max;
+                        s[i][j] = new BigDecimal(s[i][j]).subtract(new BigDecimal(Max)).doubleValue();
                     }
                 }
                 return Nd4j.create(s).transpose();

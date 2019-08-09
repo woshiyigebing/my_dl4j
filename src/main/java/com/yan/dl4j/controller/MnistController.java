@@ -44,7 +44,7 @@ public class MnistController {
         TrainData data = new MyTrainData(X_I,Y_I,128);
         model nk = new DeepNeuralNetWork(28*28)
                 .addLayer(new MyLayer(1000,new Relu()))
-                .addLastLayer(new SotfMaxCrossEntropyLastLayer(10)).setIteration(100).setLearningrate(0.006);
+                .addLastLayer(new SotfMaxCrossEntropyLastLayer(10)).setIteration(100).setLearningrate(0.06);
 //        List<Integer> LARYER = new ArrayList<>();
 //        LARYER.add(28*28);
 //        LARYER.add(1000);
