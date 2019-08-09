@@ -44,7 +44,9 @@ public class MnistController {
         INDArray Y_I = MyMathUtil.ONEHOT(Y);//60000,10
         TrainData data = new MyTrainData(X_I,Y_I,128);
         model nk = new DeepNeuralNetWork(28*28)
+                .addLayer(new MyLayer(1000,new Tanh()))
                 .addLayer(new MyLayer(500,new Tanh()))
+                .addLayer(new MyLayer(100,new Tanh()))
                 .addLastLayer(new SotfMaxCrossEntropyLastLayer(10)).setIteration(100).setLearningrate(0.06);
 //        List<Integer> LARYER = new ArrayList<>();
 //        LARYER.add(28*28);
@@ -58,7 +60,7 @@ public class MnistController {
         INDArray Y_t = MyMathUtil.ONEHOT(Nd4j.create(t_labels).transpose());
         TrainData data_t = new MyTrainData(X_t,Y_t);
         INDArray X_P = nk.predict(data_t.getX());
-        System.out.println(scord(X_P,data_t.getY()));
+        System.out.println("正确率:"+scord(X_P,data_t.getY())+"%");
         return "success";
     }
 
@@ -82,7 +84,7 @@ public class MnistController {
         return "success";
     }
 
-    public float scord(INDArray value,INDArray Y) {
+    private float scord(INDArray value,INDArray Y) {
         int res = 0;
         int sum = 0;
             double[][] s = value.transpose().toDoubleMatrix();

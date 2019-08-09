@@ -86,7 +86,7 @@ public class LinearRegressionDL4J implements model{
     }
 
 
-    private double getW()
+    public double getW()
     {
         return w;
     }
@@ -96,7 +96,7 @@ public class LinearRegressionDL4J implements model{
         this.w = w;
     }
 
-    private double getB()
+    public double getB()
     {
         return b;
     }
