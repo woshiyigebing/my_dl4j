@@ -40,15 +40,15 @@ public class LinearRegressionController {
 
     @GetMapping(value = "show")
     public String show(ModelMap map) {
+        List<point> points = pointRepository.findAll();
         if(pointmodel!=null){
             map.addAttribute ("K",pointmodel.getW());
             map.addAttribute ("B",pointmodel.getB());
-            List<point> points = pointRepository.findAll();
             map.addAttribute ("points",points);
         }else{
-            map.addAttribute ("K",0);
-            map.addAttribute ("B",0);
-            map.addAttribute ("points",0);
+            map.addAttribute ("K",1);
+            map.addAttribute ("B",1);
+            map.addAttribute ("points",points);
         }
         return"freemarker/linear/show";
     }

@@ -10,15 +10,15 @@ import java.util.List;
 public class LinearRegressionDL4J implements model{
 
     //初始化斜率
-    private double w = 0;
+    private double w = 1;
 
     //初始化截距
-    private double b = 0;
+    private double b = 1;
 
     //初始化学习速度（梯度下降速度）
-    private double learningrate = 0.01d;
+    private double learningrate = 0.001d;
 
-    private int iteration = 1000;
+    private int iteration = 10000;
 
 
     //初始化加载图像数据
