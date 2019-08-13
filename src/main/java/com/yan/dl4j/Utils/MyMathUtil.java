@@ -46,7 +46,7 @@ public class MyMathUtil {
 
     public static INDArray indArraysubMax(INDArray value){
         if(value!=null){
-            if(value.shape()[0]>1){
+            if(value.shape()[0]>1&&value.shape()[1]>1){
                 double[][] s = value.transpose().toDoubleMatrix();
                 for(int i=0;i<s.length;i++){
                     double Max = s[i][0];
@@ -60,10 +60,14 @@ public class MyMathUtil {
                 return Nd4j.create(s).transpose();
             }else{
                 double[] s = value.toDoubleVector();
+                double Max = s[0];
                 for(int i=0;i<s.length;i++){
-                    s[i] = 0;
+                    Max = Math.max(Max,s[i]);
                 }
-                return Nd4j.create(s);
+                for(int i=0;i<s.length;i++){
+                    s[i] = new BigDecimal(s[i]).subtract(new BigDecimal(Max)).doubleValue();
+                }
+                return Nd4j.create(s).reshape(value.shape());
             }
         }
         return null;
@@ -95,7 +99,7 @@ public class MyMathUtil {
 
     public static INDArray FUN_IND(INDArray value, DoubleFunction<Double> doubleFunction){
         if(value!=null){
-            if(value.shape()[0]>1){
+            if(value.shape()[0]>1&&value.shape()[1]>1){
                 double[][] s = value.toDoubleMatrix();
                 for(int i=0;i<s.length;i++){
                     for(int j =0;j<s[i].length;j++){
@@ -108,7 +112,7 @@ public class MyMathUtil {
                 for(int i=0;i<s.length;i++){
                     s[i] = doubleFunction.apply(s[i]);
                 }
-                return Nd4j.create(s);
+                return Nd4j.create(s).reshape(value.shape());
             }
         }
         return null;
@@ -167,7 +171,7 @@ public class MyMathUtil {
         if(A!=null){
             A = MyMathUtil.Epow(A);  //A: 10,128
             INDArray sum_A = Nd4j.ones(1,A.shape()[0]).mmul(A); //1,128
-            if(A.shape()[0]>1){
+            if(A.shape()[0]>1&&A.shape()[1]>1){
                 double[][] A_s = A.transpose().toDoubleMatrix(); //128 10
                 double[] SUM_A_s = sum_A.toDoubleVector();
                 for(int i=0;i<A_s.length;i++){
@@ -177,7 +181,13 @@ public class MyMathUtil {
                 }
                 return Nd4j.create(A_s).transpose();
             }else{
-                return Nd4j.ones(A.shape());
+                A = MyMathUtil.Epow(A);
+                double[] A_s= A.toDoubleVector();
+                double SUM_A_s = A.sumNumber().doubleValue();
+                for(int j =0;j<A_s.length;j++){
+                    A_s[j] = A_s[j]/SUM_A_s;
+                }
+                return Nd4j.create(A_s).reshape(A.shape());
             }
         }
         return null;

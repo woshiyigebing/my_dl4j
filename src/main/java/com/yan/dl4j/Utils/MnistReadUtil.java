@@ -3,6 +3,7 @@ package com.yan.dl4j.Utils;
 import org.nd4j.linalg.io.ClassPathResource;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
@@ -119,15 +120,15 @@ public class MnistReadUtil {
         double[] labels = getLabels(TRAIN_LABELS_FILE);
         //double[] labels = getLabels(TRAIN_LABELS_FILE);
         try{
-            drawGrayPicture(images[3],"3.jpg");
+            drawGrayPicture(images[9],"9.jpg");
             System.out.println("shape:"+images.length+","+images[0].length);
             System.out.println("shape:"+labels.length);
             System.out.println(labels[3]);
         }catch (Exception e){
             e.printStackTrace();
         }
-       // double[][] images = getImages(TEST_IMAGES_FILE);
-       // double[] labels = getLabels(TEST_LABELS_FILE);
+
+
     }
 
 
@@ -148,9 +149,37 @@ public class MnistReadUtil {
             for (int j = 0; j < high; j++) {
                 int pixel = 255 - res[i * high + j];
                 int value = pixel + (pixel << 8) + (pixel << 16);   // r = g = b 时，正好为灰度
-                bufferedImage.setRGB(j, i, value);
+                bufferedImage.setRGB(i, j, value);
             }
         }
         ImageIO.write(bufferedImage, "JPEG", new File(fileName));
+    }
+
+
+    public static double[] getSizeBlackWhiteImg(File file,int width, int height) throws IOException {
+        double[] result = null;
+        if (!file.exists()) {
+            System.out.println("图片不存在");
+            return null;
+        }
+        BufferedImage bufImg = ImageIO.read(file);
+        Image _img = bufImg.getScaledInstance(width, height, Image.SCALE_DEFAULT);
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics();
+        graphics.drawImage(_img, 0, 0, null);
+        graphics.dispose();
+        int[] rgb = new int[3];
+        result = new double[width*height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                int r = image.getRGB(i, j) & 0xFFFFFF;
+                rgb[0] = (r & 0xff0000) >> 16;
+                rgb[1] = (r & 0xff00) >> 8;
+                rgb[2] = (r & 0xff);
+                int color = 255 - (int)(rgb[0]* 0.3 + rgb[1] * 0.59 + rgb[2] * 0.11);
+                result[i*height+j] = color;
+            }
+        }
+        return result;
     }
 }
