@@ -116,14 +116,14 @@ public class MnistReadUtil {
 
     public static void main(String[] args) {
 
-        double[][] images = getImages(TRAIN_IMAGES_FILE);
-        double[] labels = getLabels(TRAIN_LABELS_FILE);
+        double[][] images = getImages(TEST_IMAGES_FILE);
+        double[] labels = getLabels(TEST_LABELS_FILE);
         //double[] labels = getLabels(TRAIN_LABELS_FILE);
         try{
-            drawGrayPicture(images[9],"9.jpg");
-            System.out.println("shape:"+images.length+","+images[0].length);
-            System.out.println("shape:"+labels.length);
-            System.out.println(labels[3]);
+            for(int i=0;i<100;i++){
+                drawGrayPicture(images[i],"0"+i+"l"+labels[i]+".jpg");
+            }
+
         }catch (Exception e){
             e.printStackTrace();
         }

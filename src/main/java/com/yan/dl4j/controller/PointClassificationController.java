@@ -37,9 +37,6 @@ public class PointClassificationController {
 
     //private model pointmodel = new NeuralNetwork();
     private model pointmodel = new DeepNeuralNetWork(2)
-            .addLayer(new MyLayer(10,new Tanh()))
-            .addLayer(new MyLayer(4,new Tanh()))
-            .addLayer(new MyLayer(2,new Tanh()))
             .addLastLayer(new MyLastLayer(1,new Sigmoid(),new MSE())).setIteration(10000).setLearningrate(0.1);
 
     @GetMapping(value = "show")
