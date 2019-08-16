@@ -10,12 +10,14 @@ import com.yan.dl4j.model.Activate.Tanh;
 import com.yan.dl4j.model.Layer.MyLastLayer;
 import com.yan.dl4j.model.Layer.MyLayer;
 import com.yan.dl4j.model.LinearRegressionDL4J;
+import com.yan.dl4j.model.Loss.LogLoss;
 import com.yan.dl4j.model.Loss.MSE;
 import com.yan.dl4j.model.NetWork.DeepNeuralNetWork;
 import com.yan.dl4j.model.NeuralNetwork;
 import com.yan.dl4j.model.model;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.io.ClassPathResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -37,7 +39,7 @@ public class PointClassificationController {
 
     //private model pointmodel = new NeuralNetwork();
     private model pointmodel = new DeepNeuralNetWork(2)
-            .addLastLayer(new MyLastLayer(1,new Sigmoid(),new MSE())).setIteration(10000).setLearningrate(0.1);
+            .addLastLayer(new MyLastLayer(1,new Sigmoid(),new LogLoss())).setIteration(1000).setLearningrate(0.1);
 
     @GetMapping(value = "show")
     public String show(ModelMap map) {

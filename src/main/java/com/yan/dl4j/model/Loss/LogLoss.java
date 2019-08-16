@@ -8,7 +8,7 @@ public class LogLoss implements LossMethod {
 
     @Override
     public INDArray LossBackward(INDArray A, INDArray Y) {
-        return A.sub(Y);
+        return A.sub(Y).div(A.mul(Nd4j.ones(A.shape()).sub(A)));
     }
 
     @Override
