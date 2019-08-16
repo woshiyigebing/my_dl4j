@@ -93,7 +93,7 @@ public class DeepNeuralNetWork implements model {
 
     private INDArray LossBackward(INDArray A,INDArray Y,String LossType){
         if(LossType.equals("LogLoss")){
-            return A.sub(Y);
+            return A.sub(Y).div(A.mul(Nd4j.ones(A.shape()).sub(A)));
         }else if(LossType.equals("MSE")){
             return A.sub(Y);
         }
