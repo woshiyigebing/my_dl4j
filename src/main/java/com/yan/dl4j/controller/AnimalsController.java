@@ -1,5 +1,7 @@
 package com.yan.dl4j.controller;
 
+import com.yan.dl4j.Utils.MnistReadUtil;
+import com.yan.dl4j.Utils.MyMathUtil;
 import org.datavec.api.io.filters.BalancedPathFilter;
 import org.datavec.api.io.labels.ParentPathLabelGenerator;
 import org.datavec.api.split.FileSplit;
@@ -29,10 +31,12 @@ import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.io.ClassPathResource;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -40,8 +44,11 @@ import org.nd4j.linalg.primitives.Pair;
 import org.nd4j.linalg.schedule.ScheduleType;
 import org.nd4j.linalg.schedule.StepSchedule;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.Arrays;
@@ -65,11 +72,12 @@ public class AnimalsController {
     protected static Random rng = new Random(seed);
     protected static int maxPathsPerLabel=18;
     protected static double splitTrainTest = 0.8;
-    protected static String modelType = "LeNet"; // LeNet, AlexNet or Custom but you need to fill it out
+    protected MultiLayerNetwork network;
+    private ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
+    private ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, labelMaker);
 
     @GetMapping(value = "train")
     private String train() throws Exception{
-        ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
         File mainPath = IMAGES_FILE.getFile();
         FileSplit fileSplit = new FileSplit(mainPath, NativeImageLoader.ALLOWED_FORMATS, rng);
         int numExamples = toIntExact(fileSplit.length());
@@ -87,26 +95,12 @@ public class AnimalsController {
                 new Pair<>(warpTransform,0.5));
         ImageTransform transform = new PipelineImageTransform(pipeline,shuffle);
         DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
-        MultiLayerNetwork network;
-        switch (modelType) {
-            case "LeNet":
-                network = lenetModel();
-                break;
-            case "AlexNet":
-                network = alexnetModel();
-                break;
-            case "custom":
-                network = customModel();
-                break;
-            default:
-                throw new InvalidInputTypeException("Incorrect model provided.");
-        }
+        network = lenetModel();
         network.init();
         UIServer uiServer = UIServer.getInstance();
         StatsStorage statsStorage = new InMemoryStatsStorage();
         uiServer.attach(statsStorage);
         network.setListeners(new StatsListener( statsStorage),new ScoreIterationListener(1));
-        ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, labelMaker);
         DataSetIterator dataIter;
         recordReader.initialize(trainData, null);
         dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, numLabels);
@@ -128,12 +122,35 @@ public class AnimalsController {
 
         dataIter.reset();
         DataSet testDataSet = dataIter.next();
-        List<String> allClassLabels = recordReader.getLabels();
         int labelIndex = testDataSet.getLabels().argMax(1).getInt(0);
         int[] predictedClasses = network.predict(testDataSet.getFeatures());
-        String expectedResult = allClassLabels.get(labelIndex);
-        String modelPrediction = allClassLabels.get(predictedClasses[0]);
         return "freemarker/success";
+    }
+
+    @GetMapping(value = "/file")
+    public String file() {
+        return "freemarker/animals/file";
+    }
+
+    @RequestMapping("predict")
+    public String predict(@RequestParam(value = "file") MultipartFile file, ModelMap map){
+        if (file.isEmpty()) {
+            System.out.println("文件为空空");
+        }
+        try{
+            File my_file = File.createTempFile("tmp", null);
+            file.transferTo(my_file);
+            NativeImageLoader loader = new NativeImageLoader(height, width, channels);
+            INDArray image = loader.asMatrix(my_file);
+            int[] predictedClasses = network.predict(image);
+            List<String> allClassLabels = recordReader.getLabels();
+            String modelPrediction = allClassLabels.get(predictedClasses[0]);
+            map.addAttribute ("type",modelPrediction);
+            return "freemarker/animals/predict";
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "freemarker/fail";
     }
 
     private ConvolutionLayer convInit(String name, int in, int out, int[] kernel, int[] stride, int[] pad, double bias) {
